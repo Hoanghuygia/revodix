@@ -1,0 +1,46 @@
+/* Shared UI primitives. No hosting identity, account data, or SaaS behavior. */
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const paths = {
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  inbox:'<path d="m4 4-2 11v5h20v-5L20 4Z"/><path d="M2 15h6l2 3h4l2-3h6"/>',
+  chart:'<path d="M3 3v18h18M7 15l4-5 4 3 5-7"/>',
+  book:'<path d="M12 6v15M3 4c4-1 6 0 9 2 3-2 5-3 9-2v15c-4-1-6 0-9 2-3-2-5-3-9-2Z"/>',
+  spark:'<path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4ZM20 2v4m-2-2h4"/>',
+  plug:'<path d="m8 3 3 3M16 5l3 3M6 10l8-8 8 8-8 8-8-8ZM10 14l-4 4c-2 2-4 2-5 1M5 9l10 10"/>',
+  coin:'<circle cx="12" cy="12" r="9"/><path d="M15 8c-4-3-8 0-8 4s4 7 8 4"/>',
+  help:'<circle cx="12" cy="12" r="9"/><path d="M9 9c0-4 7-4 6 0-.5 2-3 2-3 5m0 3v.1"/>',
+  chevron:'<path d="m9 5 7 7-7 7"/>', down:'<path d="m6 9 6 6 6-6"/>', arrow:'<path d="M4 12h16m-6-6 6 6-6 6"/>', back:'<path d="M20 12H4m6-6-6 6 6 6"/>',
+  search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+  bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/>',
+  chat:'<path d="M21 11a9 9 0 0 1-9 9 9 9 0 0 1-5-1.5L3 20l1.5-4A9 9 0 0 1 12 2a9 9 0 0 1 9 9Z"/><path d="M8 11h.1M12 11h.1M16 11h.1"/>',
+  kakao:'<path d="M21 10c0 4-4 7-9 7H9l-5 4 1-6c-2-1-3-3-3-5 0-4 4-7 10-7s9 3 9 7Z"/><path d="M7 8h10M9 8v5m6-5v5"/>',
+  slack:'<path d="M9 3v14M15 7v14M3 9h14M7 15h14M5 3v2M19 3v2M3 19h2M19 19h2"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>',
+  up:'<path d="m5 15 7-7 7 7M12 8v12"/>', trend:'<path d="m3 17 6-6 4 4 8-10M15 5h6v6"/>',
+  check:'<path d="m4 12 5 5L20 6"/>', checkCircle:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+  send:'<path d="m22 2-7 20-4-9-9-4 20-7ZM11 13 22 2"/>',
+  link:'<path d="m10 14 4-4M8 16l-2 2a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m2 1 2-2a4 4 0 0 1 6 6l-5 5a4 4 0 0 1-6 0"/>',
+  file:'<path d="M14 2H4v20h16V8l-6-6ZM14 2v6h6M8 12h8M8 16h5"/>',
+  upload:'<path d="M3 15v6h18v-6M12 16V3m-5 5 5-5 5 5"/>',
+  download:'<path d="M3 15v6h18v-6M12 3v13m-5-5 5 5 5-5"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  more:'<circle cx="5" cy="12" r=".6"/><circle cx="12" cy="12" r=".6"/><circle cx="19" cy="12" r=".6"/>',
+  gear:'<path d="m9 3 1 3h4l1-3 3 2-1 3 2 3 3-1v4l-3 1-2 3 1 3-3 1-1-3h-4l-1 3-3-2 1-3-2-3-3 1v-4l3-1 2-3-1-3Z"/><circle cx="12" cy="12" r="3"/>',
+  lock:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4m-4 5v2"/>',
+  filter:'<path d="M4 5h16l-6 7v7l-4 2v-9L4 5Z"/>',
+  refresh:'<path d="M20 7v5h-5M4 17v-5h5M5 7a8 8 0 0 1 14 0m0 10a8 8 0 0 1-14 0"/>',
+  close:'<path d="m6 6 12 12M6 18 18 6"/>', menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+  people:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6m2 4c3 0 4 2 4 5"/>',
+  building:'<path d="M4 21V3h12v18M16 9h4v12M2 21h20M8 7h4M8 11h4M8 15h4M9 21v-3h2v3"/>',
+  calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 11h18"/>',
+  edit:'<path d="m16 3 5 5-12 12-6 1 1-6L16 3Zm-2 2 5 5"/>',
+  shield:'<path d="m12 2 9 4v6c0 6-9 10-9 10S3 18 3 12V6l9-4Z"/><path d="m8 12 3 3 5-6"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18"/>',
+  external:'<path d="M14 3h7v7M21 3l-10 10M10 3H3v18h18v-7"/>',
+  message:'<path d="M21 16V3H3v18l5-5h13ZM7 7h10M7 11h6"/>',
+  bolt:'<path d="m13 2-9 12h7l-1 8 10-12h-7l1-8Z"/>'
+};
+function icon(name, cls = '') { return `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true">${paths[name] || paths.grid}</svg>`; }
